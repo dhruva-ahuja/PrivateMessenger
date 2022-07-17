@@ -12,33 +12,39 @@ import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
-import { messageExamples } from '../Static/TestData';
-import { MessageExample } from '../Interfaces/MessageExample';
+import { messageHome } from '../Static/TestData';
+import { messageArchieved } from '../Static/TestData';
+import { messageLiked } from '../Static/TestData';
+import PeopleIcon from '@mui/icons-material/People';
 
-function refreshMessages(): MessageExample[] {
-  const getRandomInt = (max: number) => Math.floor(Math.random() * Math.floor(max));
 
-  return Array.from(new Array(50)).map(
-    () => messageExamples[getRandomInt(messageExamples.length)],
-  );
-}
-
-export default function FixedBottomNavigation() {
+export default function Message_list() {
   const [value, setValue] = React.useState(0);
   const ref = React.useRef<HTMLDivElement>(null);
-  const [messages, setMessages] = React.useState(() => refreshMessages());
-
+  const [messages, setMessages] = React.useState(() => messageHome);
   React.useEffect(() => {
     (ref.current as HTMLDivElement).ownerDocument.body.scrollTop = 0;
-    setMessages(refreshMessages());
-  }, [value, setMessages]);
+    if (value == 0) {
+      setMessages(messageHome);
+      document.title = "Home";
+    }
+    else if (value == 1) {
+      setMessages(messageLiked);
+      document.title = "Liked Messages";
+    }
+    else if (value == 2) {
+      document.title = "Archieved";
+      setMessages(messageArchieved);
+    }
+  },
+    [value, setMessages]);
 
   return (
     <Box sx={{ pb: 7 }} ref={ref}>
       <CssBaseline />
       <List>
         {messages.map(({ primary, secondary, person }, index) => (
-          <ListItem button key={index + person} onClick={() => click(primary)}>
+          <ListItem button key={index + person} onClick={() => click_message(primary)}>
             <ListItemAvatar>
               <Avatar alt="Profile Picture" src={person} />
             </ListItemAvatar>
@@ -52,17 +58,19 @@ export default function FixedBottomNavigation() {
           value={value}
           onChange={(event, newValue) => {
             setValue(newValue);
+            console.log(newValue);
           }}
         >
           <BottomNavigationAction label="Home" icon={<HomeIcon />} />
           <BottomNavigationAction label="Favorites" icon={<FavoriteIcon />} />
           <BottomNavigationAction label="Archive" icon={<ArchiveIcon />} />
+          <BottomNavigationAction label="Friends" icon={<PeopleIcon />} />
         </BottomNavigation>
       </Paper>
     </Box>
   );
 }
 
-const click = (message: string) => {
+const click_message = (message: string) => {
   window.alert(message)
 }
